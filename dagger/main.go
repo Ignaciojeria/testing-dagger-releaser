@@ -32,13 +32,15 @@ func PublishRelease(ctx context.Context) error {
 	// Get `goreleaser` image
 	container := client.Container().From("goreleaser/goreleaser:latest")
 
-	// Set environment
-	container = container.WithEnvVariable("GITHUB_TOKEN", os.Getenv("GITHUB_ACCESS_TOKEN"))
+	// Set environment variables
+	container = container.
+		WithEnvVariable("GITHUB_TOKEN", os.Getenv("GITHUB_ACCESS_TOKEN")).
+		WithEnvVariable("GORELEASER_CURRENT_TAG", "1.0.6")
 
 	// Mount cloned repository into `goreleaser` image
 	container = container.WithDirectory("/src", src).WithWorkdir("/src")
 
-	// Define the application build command with the tag from .version
+	// Define the application build command
 	container = container.WithExec([]string{"goreleaser", "--config", ".goreleaser.yml"})
 
 	// Get reference to build output directory in container
