@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"dagger.io/dagger"
 	"github.com/joho/godotenv"
@@ -27,27 +28,35 @@ func PublishRelease(ctx context.Context) error {
 		return err
 	}
 
-	// get reference to the local project
+	// Read the tag from .version file
+	tag, err := os.ReadFile(".version")
+	if err != nil {
+		return fmt.Errorf("failed to read .version file: %w", err)
+	}
+
+	// Trim any extra whitespace from the tag
+	tagStr := strings.TrimSpace(string(tag))
+
+	// Get reference to the local project
 	src := client.Host().Directory(".")
 
-	// get `goreleaser` image
+	// Get `goreleaser` image
 	container := client.Container().From("goreleaser/goreleaser:latest")
 
-	// set environment
+	// Set environment
 	container = container.WithEnvVariable("GITHUB_TOKEN", os.Getenv("GITHUB_ACCESS_TOKEN"))
 
-	// mount cloned repository into `goreleaser` image
+	// Mount cloned repository into `goreleaser` image
 	container = container.WithDirectory("/src", src).WithWorkdir("/src")
 
-	// define the application build command
-	path := "dist/"
-	container = container.WithExec([]string{"goreleaser", "--config", ".goreleaser.yml"})
+	// Define the application build command with the tag from .version
+	container = container.WithExec([]string{"goreleaser", "--rm-dist", "--config", ".goreleaser.yml", "--release", tagStr})
 
-	// get reference to build output directory in container
-	output := container.Directory(path)
+	// Get reference to build output directory in container
+	output := container.Directory("dist")
 
-	// write contents of container build/ directory to the host
-	_, err = output.Export(ctx, path)
+	// Write contents of container build/ directory to the host
+	_, err = output.Export(ctx, "dist")
 	if err != nil {
 		return err
 	}
