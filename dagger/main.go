@@ -39,7 +39,7 @@ func PublishRelease(ctx context.Context) error {
 	container = container.WithDirectory("/src", src).WithWorkdir("/src")
 
 	// Define the application build command with the tag from .version
-	container = container.WithExec([]string{"goreleaser", "--rm-dist", "--config", ".goreleaser.yml"})
+	container = container.WithExec([]string{"goreleaser", "--config", ".goreleaser.yml"})
 
 	// Get reference to build output directory in container
 	output := container.Directory("dist")
