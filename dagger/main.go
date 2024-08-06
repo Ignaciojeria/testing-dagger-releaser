@@ -35,6 +35,7 @@ func PublishRelease(ctx context.Context) error {
 	// Set environment variables
 	container = container.
 		WithEnvVariable("GITHUB_TOKEN", os.Getenv("GITHUB_ACCESS_TOKEN")).
+		WithEnvVariable("GORELEASER_PREVIOUS_TAG", "1.0.4").
 		WithEnvVariable("GORELEASER_CURRENT_TAG", "1.0.6")
 
 	// Mount cloned repository into `goreleaser` image
