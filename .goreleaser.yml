@@ -5,7 +5,7 @@ before:
 
 builds:
   - id: "einar"
-    main: "./main.go"
+    main: "../main.go"
     binary: "einar"
     goos:
       - linux
