@@ -1,0 +1,9 @@
+{
+  "project": "testing-releaser",
+  "template": {
+    "tag": "v6.9.5",
+    "url": "https://github.com/Ignaciojeria/einar-cli-standard-template"
+  },
+  "installations": null,
+  "components": null
+}
